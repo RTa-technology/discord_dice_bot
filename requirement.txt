@@ -1,0 +1,6 @@
+oauth2client
+httplib2
+gspread
+discord
+parse
+numpy
