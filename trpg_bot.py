@@ -8,7 +8,8 @@ import json
 import unicodedata
 import argparse
 
-def get_east_asian_width_count(text):
+@client.event
+async def get_east_asian_width_count(text):
     count = 0
     for c in text:
         if unicodedata.east_asian_width(c) in 'FWA':
@@ -17,12 +18,14 @@ def get_east_asian_width_count(text):
             count += 1
     return count
 
-def load_config(filepath):
+@client.event
+async def load_config(filepath):
     with open(filepath) as f:
         conf = json.load(f)
     return conf
 
-def get_gs():
+@client.event
+async def get_gs():
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
     json_file = conf['json_file']#OAuth用クライアントIDの作成でダウンロードしたjsonファイル
     credentials = ServiceAccountCredentials.from_json_keyfile_name(json_file, scopes=scopes)
