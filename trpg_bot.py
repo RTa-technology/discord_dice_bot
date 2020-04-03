@@ -481,9 +481,6 @@ def bot_startswitch(message):
     else:
         return None
 
-def playmp3(voice, filepath):
-    voice.play(discord.FFmpegPCMAudio(filepath), after=lambda e: print('play error:', e))
-
 parser = argparse.ArgumentParser(description='')
 
 parser.add_argument('-m', '--mode', help='run mode option', default='release', choices=['debug', 'release'])
