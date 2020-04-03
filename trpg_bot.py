@@ -24,14 +24,14 @@ def load_config(filepath):
 
 def get_gs():
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
-    json_file = conf['json_file']#OAuth用クライアントIDの作成でダウンロードしたjsonファイル
+    json_file = conf['json_file'] #OAuth用クライアントIDの作成でダウンロードしたjsonファイル
     credentials = ServiceAccountCredentials.from_json_keyfile_name(json_file, scopes=scopes)
     http_auth = credentials.authorize(Http())
 
     # スプレッドシート用クライアントの準備
-    doc_id = conf['doc_id']##これはスプレッドシートのURLのうちhttps://docs.google.com/spreadsheets/d/以下の部分です
+    doc_id = conf['doc_id'] #これはスプレッドシートのURLのうちhttps://docs.google.com/spreadsheets/d/以下の部分です
     gs = gspread.authorize(credentials)
-    gfile   = gs.open_by_key(doc_id)#読み書きするgoogle spreadsheet
+    gfile   = gs.open_by_key(doc_id) #読み書きするgoogle spreadsheet
     return gfile
 
 def get_charactor(name):
