@@ -7,49 +7,6 @@ from parse import parse
 import json
 import unicodedata
 import argparse
-
-
-
-parser = argparse.ArgumentParser(description='')
-
-parser.add_argument('-m', '--mode', help='run mode option', default='release', choices=['debug', 'release'])
-
-args = parser.parse_args()
-
-filepath = {
-    'debug': 'config_test.json',
-    'release': 'config.json'
-}
-
-conf = load_config(filepath[args.mode])
-client = discord.Client()
-client_id = conf['client_id']
-
-
-@client.event
-async def on_ready():
-    print('Logged in')
-    print('-----')
-
-@client.event
-async def on_message(message):
-    global voice
-    # 送り主がBotじゃないか
-    if client.user != message.author:
-        if voice is None:
-            channel = message.author.voice.channel
-            voice = await channel.connect()
-        # 開始ワード
-        input_msg = bot_startswitch(message).fixed
-        if input_msg is not None:
-            m = 'PL:' + message.author.name + '\n'
-            m += dice_message(input_msg, message)
-        # メッセージが送られてきたチャンネルへメッセージを送ります
-            playmp3(voice, 'dice.mp3')
-            await message.channel.send(m) # discord.py ver1.0
-            #await client.send_message(message.channel, m) # discord.py ver0.16
-
-            
 def get_east_asian_width_count(text):
     count = 0
     for c in text:
@@ -522,4 +479,47 @@ def bot_startswitch(message):
         return parse('VS {}/{}', message.content)
     else:
         return None
+
+
+parser = argparse.ArgumentParser(description='')
+
+parser.add_argument('-m', '--mode', help='run mode option', default='release', choices=['debug', 'release'])
+
+args = parser.parse_args()
+
+filepath = {
+    'debug': 'config_test.json',
+    'release': 'config.json'
+}
+
+conf = load_config(filepath[args.mode])
+client = discord.Client()
+client_id = conf['client_id']
+
+
+@client.event
+async def on_ready():
+    print('Logged in')
+    print('-----')
+
+@client.event
+async def on_message(message):
+    global voice
+    # 送り主がBotじゃないか
+    if client.user != message.author:
+        if voice is None:
+            channel = message.author.voice.channel
+            voice = await channel.connect()
+        # 開始ワード
+        input_msg = bot_startswitch(message).fixed
+        if input_msg is not None:
+            m = 'PL:' + message.author.name + '\n'
+            m += dice_message(input_msg, message)
+        # メッセージが送られてきたチャンネルへメッセージを送ります
+            playmp3(voice, 'dice.mp3')
+            await message.channel.send(m) # discord.py ver1.0
+            #await client.send_message(message.channel, m) # discord.py ver0.16
+
+            
+
 client.run(client_id)
