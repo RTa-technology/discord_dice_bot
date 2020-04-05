@@ -8,8 +8,7 @@ import json
 import unicodedata
 import argparse
 
-@client.event
-async def get_east_asian_width_count(text):
+def get_east_asian_width_count(text):
     count = 0
     for c in text:
         if unicodedata.east_asian_width(c) in 'FWA':
@@ -18,14 +17,12 @@ async def get_east_asian_width_count(text):
             count += 1
     return count
 
-@client.event
-async def load_config(filepath):
+def load_config(filepath):
     with open(filepath) as f:
         conf = json.load(f)
     return conf
 
-@client.event
-async def get_gs():
+def get_gs():
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
     json_file = conf['json_file']#OAuth用クライアントIDの作成でダウンロードしたjsonファイル
     credentials = ServiceAccountCredentials.from_json_keyfile_name(json_file, scopes=scopes)
@@ -37,8 +34,7 @@ async def get_gs():
     gfile   = gs.open_by_key(doc_id)#読み書きするgoogle spreadsheet
     return gfile
 
-@client.command()
-async def get_charactor(name):
+def get_charactor(name):
 
     gfile = get_gs()
 
@@ -64,19 +60,16 @@ async def get_charactor(name):
         }
     return charactor
 
-@client.command()
-async def dice(dice_num, dice_size):
+def dice(dice_num, dice_size):
     return np.random.randint(1, int(dice_size), int(dice_num))
 
-@client.command()
-async def judge(dice_array, ability):
+def judge(dice_array, ability):
     if int(ability) >= np.sum(dice_array):
         return True
     else:
         return False
 
-@client.command()
-async def damage(charactor, key):
+def damage(charactor, key):
     d = np.array([], dtype=np.int64)
     if key == 'こぶし':
         d = np.append(d, dice(1, 3))
@@ -98,8 +91,7 @@ async def damage(charactor, key):
     return d
 
 
-@client.command()
-async def temp_madness():
+def temp_madness():
     roll = {}
     roll[1] = '鸚鵡返し（誰かの動作・発言を真似することしか出来なくなる）'
     roll[2] = '健忘症（1d6時間以内のことを忘れる）'
@@ -125,8 +117,7 @@ async def temp_madness():
     msg += '\n一時的狂気(' + str(dice(1, 10)+4) + 'ラウンドまたは' + str(dice(1, 6)*10+30) + '分)'
     return msg
 
-@client.command()
-async def ind_madness():
+def ind_madness():
     roll = {}
     roll[1] = '失語症（言葉を使う技能が使えなくなる）'
     roll[2] = '心因性難聴（聞き耳不可。精神分析を受ける際に技能値に-30）'
@@ -142,8 +133,7 @@ async def ind_madness():
     msg += '\n不定の狂気(' + str(dice(1, 10)*10) + '時間)'
     return msg
 
-@client.command()
-async def against(input_msg):
+def against(input_msg):
     active = int(input_msg[0])
     passive = int(input_msg[1])
 
@@ -172,8 +162,7 @@ async def against(input_msg):
                 result_msg = result_msg
             )
 
-@client.command()
-async def charactor_make():
+def charactor_make():
     status = {}
     status['STR'] = np.sum(dice(3, 6))
     status['CON'] = np.sum(dice(3, 6))
@@ -231,8 +220,7 @@ async def charactor_make():
         msg += '{k} {v} \n'.format(k=k, v=v)
     return msg
 
-@client.command()
-async def charactor_introduce(message):
+def charactor_introduce(message):
     charactor = get_charactor(str(message.author))
     status = {}
     status['キャラクター名'] = charactor['NAME']['value']
@@ -257,8 +245,7 @@ async def charactor_introduce(message):
         msg += '{k}: {v} \n'.format(k=k, v=v)
     return msg
 
-@client.command()
-async def simple_dice(input_msg):
+def simple_dice(input_msg):
     def single_dice(msg, opt):
         dice_info = msg.split('d')
         dice_num = int(dice_info[0])
@@ -380,8 +367,7 @@ async def simple_dice(input_msg):
         result_msg = result_msg,
         dummy_blank = dummy_blank)
 
-@client.command()
-async def result_message(dice_size, dice_array, result=None, charactor=None, ability_name=None):
+def result_message(dice_size, dice_array, result=None, charactor=None, ability_name=None):
     if result:
         inequality = '>='
         result_msg = 'Success'
@@ -402,8 +388,7 @@ async def result_message(dice_size, dice_array, result=None, charactor=None, abi
     return (inequality, d, result_msg)
 
 
-@client.command()
-async def dice_message(input_msg, message):
+def dice_message(input_msg, message):
     if '不定の狂気' in input_msg:
         return ind_madness()
     elif '一時的狂気' in input_msg:
@@ -450,8 +435,7 @@ async def dice_message(input_msg, message):
                     dice_array = dice_array,
                     result_msg = result_msg)
 
-@client.command()
-async def calc_ability(input_msg, charactor):
+def calc_ability(input_msg, charactor):
     operators = ['+', '-', '*', '/']
     for opt in operators:
         if  opt in input_msg:
@@ -471,8 +455,7 @@ async def calc_ability(input_msg, charactor):
 
     return ability_name, int(ability), (charactor[ability_name]['value'], operator, correction)
 
-@client.command()
-async def help():
+def help():
     msg = '【使い方】\n'\
     '**ダイスロール**: `/dice [ダイスの数]d[出目の最大値]`\n'\
     '**技能判定**: `/[技能名]`\n'\
@@ -484,8 +467,7 @@ async def help():
     '**キャラ紹介**: `/ci`\n'
     return msg
 
-@client.command()
-async def bot_startswitch(message):
+def bot_startswitch(message):
     # 開始ワード
     if message.content.startswith('/dice'):
         return parse('/dice {}', message.content)
@@ -499,8 +481,7 @@ async def bot_startswitch(message):
     else:
         return None
 
-@client.command()
-async def playmp3(voice, filepath):
+def playmp3(voice, filepath):
     voice.play(discord.FFmpegPCMAudio(filepath), after=lambda e: print('play error:', e))
 
 parser = argparse.ArgumentParser(description='')
@@ -544,4 +525,3 @@ async def on_message(message):
             #await client.send_message(message.channel, m) # discord.py ver0.16
 
 client.run(client_id)
-
