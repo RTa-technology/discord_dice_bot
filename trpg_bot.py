@@ -7,7 +7,7 @@ from parse import parse
 import json
 import unicodedata
 import argparse
-
+ 
 def get_east_asian_width_count(text):
     count = 0
     for c in text:
@@ -16,35 +16,47 @@ def get_east_asian_width_count(text):
         else:
             count += 1
     return count
-
-def load_config(filepath):
-    with open(filepath) as f:
-        conf = json.load(f)
-    return conf
-
-def get_gs():
-    scopes = ['https://www.googleapis.com/auth/spreadsheets']
-    json_file = conf['json_file']#OAuth用クライアントIDの作成でダウンロードしたjsonファイル
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(json_file, scopes=scopes)
-    http_auth = credentials.authorize(Http())
-
-    # スプレッドシート用クライアントの準備
-    doc_id = conf['doc_id']##これはスプレッドシートのURLのうちhttps://docs.google.com/spreadsheets/d/以下の部分です
-    gs = gspread.authorize(credentials)
-    gfile   = gs.open_by_key(doc_id)#読み書きするgoogle spreadsheet
-    return gfile
-
+ 
+# def load_config(filepath):
+#     with open(filepath) as f:
+#         conf = json.load(f)
+#     return conf
+ 
+# def get_gs():
+#     scopes = ['https://www.googleapis.com/auth/spreadsheets']
+#     json_file = conf['json_file']#OAuth用クライアントIDの作成でダウンロードしたjsonファイル
+#     credentials = ServiceAccountCredentials.from_json_keyfile_name(json_file, scopes=scopes)
+#     http_auth = credentials.authorize(Http())
+ 
+#     # スプレッドシート用クライアントの準備
+#     doc_id = conf['doc_id']##これはスプレッドシートのURLのうちhttps://docs.google.com/spreadsheets/d/以下の部分です
+#     gs = gspread.authorize(credentials)
+#     gfile   = gs.open_by_key(doc_id)#読み書きするgoogle spreadsheet
+#     return gfile
+ 
 def get_charactor(name):
-
-    gfile = get_gs()
-
+ 
+    # gfile = get_gs()
+ 
     #worksheetの名前はdiscordのユーザー名にしておく
-    worksheet = gfile.worksheet(name)
-
+    # worksheet = gfile.worksheet(name)
+    worksheet = ['4176', '4091', '4560']
+    4176.col_keys = ['STR', 'DEX', 'INT', 'CON', 'APP', 'POW', 'SIZ', 'SAN', 'EDU', 'db', '回避', '機械修理', '聞き耳', '重機械操作', '操縦(飛行機)', '追跡', '電気修理', '天文学', 'ナビゲート', '物理学', '母国語(英語)', '目星', 'ショットガン']
+    4176.col_values = ['14', '14', '13', '14', '10', '11', '10', '55', '15', '0', '28', '70', '65', '21', '71', '60', '30', '21', '70', '21', '65', '65', '70']
+    4176.col_dice = ['1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '0', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100']
+ 
+    4176.col_keys = ['STR', 'DEX', 'INT', 'CON', 'APP', 'POW', 'SIZ', 'SAN', 'EDU', 'db', '言いくるめ', '運転(自動車)', '応急手当', '回避', '鍵開け', '心理学', '図書館', '法律', '組みつき', 'マーシャルアーツ', 'こぶし', '母国語(英語)', '拳銃']
+    4176.col_values = ['12', '12', '11', '7', '7', '11', '12', '55', '9', '0', '30', '40', '70', '50', '31', '15', '45', '20', '45', '25', '70', '45', '60']
+    4176.col_dice = ['1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '0', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100']
+ 
+    4176.col_keys = ['STR', 'DEX', 'INT', 'CON', 'APP', 'POW', 'SIZ', 'SAN', 'EDU', 'db', '回避', '信用', '製作', '乗馬', '跳躍', '自動車', 'マーシャルアーツ', '隠れる', '応急手当', '忍び歩き', '母国語(英語)', '目星', 'ショットガン']
+    4176.col_values = ['18', '13', '14', '11', '', '10', '6', '13', '30', '18', '0', '61', '85', '75', '75', '85', '20', '1', '50', '50', '50', '65', '65', '85']
+    4176.col_dice = ['1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d4', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100']
+ 
     charactor = {}
-    cell_keys = worksheet.col_values(1)
-    cell_values = worksheet.col_values(2)
-    cell_dice = worksheet.col_values(7)
+    cell_keys = worksheet.col_keys
+    cell_values = worksheet.col_values
+    cell_dice = worksheet.col_dice
     for k, v, d in zip(cell_keys, cell_values, cell_dice):
         if d == 'dice':
             dice_num = 0
@@ -59,16 +71,16 @@ def get_charactor(name):
             'dice_size': dice_size
         }
     return charactor
-
+ 
 def dice(dice_num, dice_size):
     return np.random.randint(1, int(dice_size), int(dice_num))
-
+ 
 def judge(dice_array, ability):
     if int(ability) >= np.sum(dice_array):
         return True
     else:
         return False
-
+ 
 def damage(charactor, key):
     d = np.array([], dtype=np.int64)
     if key == 'こぶし':
@@ -79,7 +91,7 @@ def damage(charactor, key):
         d = np.append(d, dice(1, 6))
     else:
         return None
-
+ 
     if charactor and 'd' in charactor['db']['value']:
         result = parse('{}d{}', charactor['db']['value'])
         dice_size = int(result[1])
@@ -89,8 +101,7 @@ def damage(charactor, key):
         else:
             d = np.hstack([d, dice(1, dice_size)])
     return d
-
-
+ 
 def temp_madness():
     roll = {}
     roll[1] = '鸚鵡返し（誰かの動作・発言を真似することしか出来なくなる）'
@@ -116,7 +127,7 @@ def temp_madness():
     msg = roll[dice(1, 20)[0]]
     msg += '\n一時的狂気(' + str(dice(1, 10)+4) + 'ラウンドまたは' + str(dice(1, 6)*10+30) + '分)'
     return msg
-
+ 
 def ind_madness():
     roll = {}
     roll[1] = '失語症（言葉を使う技能が使えなくなる）'
@@ -132,14 +143,14 @@ def ind_madness():
     msg = roll[dice(1, 10)[0]]
     msg += '\n不定の狂気(' + str(dice(1, 10)*10) + '時間)'
     return msg
-
+ 
 def against(input_msg):
     active = int(input_msg[0])
     passive = int(input_msg[1])
-
+ 
     achivement = 50 + ( (active - passive) * 5)
     dice_array = dice(1, 100)
-
+ 
     result = judge(dice_array, achivement)
     if result:
         inequality = '>='
@@ -151,7 +162,7 @@ def against(input_msg):
         result_msg = 'Fail'
         if np.sum(dice_array) >= 96:
             result_msg += '【ファンブル】'
-
+ 
     return  '【対抗ロール】{active} VS {passive}'\
             ' : {achivement} {inequality} {dice_result} --> {result_msg}'.format(
                 active = active,
@@ -161,7 +172,7 @@ def against(input_msg):
                 dice_result = np.sum(dice_array),
                 result_msg = result_msg
             )
-
+ 
 def charactor_make():
     status = {}
     status['STR'] = np.sum(dice(3, 6))
@@ -172,7 +183,7 @@ def charactor_make():
     status['SIZ'] = np.sum(dice(2, 6)) + 6
     status['INT'] = np.sum(dice(2, 6)) + 6
     status['EDU'] = np.sum(dice(3, 6)) + 3
-
+ 
     print('---')
     for k,v in status.items():
         if  8 <= v and v <= 12:
@@ -191,14 +202,14 @@ def charactor_make():
         status['INT'] = 8
     if status['EDU'] < 6:
         status['EDU'] = 6
-
+ 
     status['HP'] = int((status['CON'] + status['SIZ']) / 2)
     status['MP'] = status['POW']
     status['SAN'] = status['POW'] * 5
     status['アイディア'] = status['INT'] * 5
     status['幸運'] = status['POW'] * 5
     status['知識'] = status['EDU'] * 5
-    
+ 
     ATK = (status['STR'] + status['SIZ'])
     if 2 <= ATK and ATK <= 12:
         status['db'] = '-1d6'
@@ -214,12 +225,12 @@ def charactor_make():
         status['db'] = '2d6'
     elif 57 <= ATK and ATK <= 72:
         status['db'] = '3d6'
-
+ 
     msg = ''
     for k, v in zip(status.keys(), status.values()):
         msg += '{k} {v} \n'.format(k=k, v=v)
     return msg
-
+ 
 def charactor_introduce(message):
     charactor = get_charactor(str(message.author))
     status = {}
@@ -239,27 +250,27 @@ def charactor_introduce(message):
     status['幸運'] = charactor['幸運']['value']
     status['知識'] = charactor['知識']['value']
     status['db'] = charactor['db']['value']
-
+ 
     msg = ''
     for k, v in zip(status.keys(), status.values()):
         msg += '{k}: {v} \n'.format(k=k, v=v)
     return msg
-
+ 
 def simple_dice(input_msg):
     def single_dice(msg, opt):
         dice_info = msg.split('d')
         dice_num = int(dice_info[0])
         dice_size = int(dice_info[1])
         return np.array([int(opt+str(d)) for d in dice(dice_num, dice_size)])
-
+ 
     secret = None
     top_secret = None
     ability = None
-
+ 
     msg = input_msg[0]
     # ||を除去
     msg = msg.replace('||', '')
-
+ 
     # 返り値を全て隠す
     if 'top_secret' in msg:
         msg = parse('{} top_secret', msg)[0]
@@ -268,22 +279,22 @@ def simple_dice(input_msg):
     elif 'secret' in msg:
         msg = parse('{} secret', msg)[0]
         secret = True
-
+ 
     # ()を除去する
     if '(' in msg:
         tmp = parse('{}({})', msg)
         ability = tmp[1]
         msg = tmp[0]
         dice_size = 100
-
+ 
     dice_array = np.array([], dtype=np.int64)
-
+ 
     operator = ('+', '-')
     opts = list()
-
+ 
     if not msg.startswith('-'):
         msg = '+' + msg
-
+ 
     while any(m in msg for m in operator):
         # 文頭から数えて最初に出てくる演算子を探す
         opts.append(operator[np.argmin([msg.find(opt) if msg.find(opt)>=0 else 999 for opt in operator])])
@@ -294,7 +305,7 @@ def simple_dice(input_msg):
             continue
         else:
             msg_tmp = msg.split(opts[1], 1)
-
+ 
         opt = opts.pop(0)
         # diceを振る
         if 'd' in msg_tmp[0]:
@@ -303,7 +314,7 @@ def simple_dice(input_msg):
         # 固定値
         else:
             dice_array = np.append(dice_array, int(opt+msg_tmp[0]))
-            
+ 
         msg = msg_tmp[1] # 残りのテキストを取り出す
     else: # 最後のテキストに対する処理
         opt = opts.pop(0)
@@ -312,7 +323,7 @@ def simple_dice(input_msg):
             dice_array = np.append(dice_array, dice_result)
         else:
             dice_array = np.append(dice_array, int(opt+msg))
-
+ 
     # 技能判定
     if ability:
         result = judge(dice_array, ability)
@@ -321,7 +332,7 @@ def simple_dice(input_msg):
         result_msg += msg
     else:
         (inequality, _, result_msg) = ('', '', '')
-
+ 
     # シークレットメッセージにする
     if secret:
         secret = '||'
@@ -331,7 +342,7 @@ def simple_dice(input_msg):
         top_secret = '||'
     else:
         top_secret = ''
-
+ 
     return_msg = '【ダイス】({secret}{ability}{secret}):{inequality} {dice_result}={dice_array} {result_msg}'.format(
         secret = secret,
         ability = ability,
@@ -339,7 +350,7 @@ def simple_dice(input_msg):
         dice_result = np.sum(dice_array),
         dice_array = dice_array,
         result_msg = result_msg)
-
+ 
     # top_secretを使った時の文字幅調整
     dummy_blank = ''
     if '【' in result_msg:
@@ -349,14 +360,13 @@ def simple_dice(input_msg):
             count_len = 92
         else:
             count_len = 84
-
-
+ 
     while get_east_asian_width_count(return_msg+dummy_blank) < count_len:
         dummy_blank += ' '
-
+ 
     print(return_msg+dummy_blank)
     print(get_east_asian_width_count(return_msg+dummy_blank))
-
+ 
     return '【ダイス】{top_secret}({secret}{ability}{secret}):{inequality} {dice_result}={dice_array} {result_msg}{dummy_blank}{top_secret}'.format(
         top_secret = top_secret,
         secret = secret,
@@ -366,7 +376,7 @@ def simple_dice(input_msg):
         dice_array = dice_array,
         result_msg = result_msg,
         dummy_blank = dummy_blank)
-
+ 
 def result_message(dice_size, dice_array, result=None, charactor=None, ability_name=None):
     if result:
         inequality = '>='
@@ -384,10 +394,9 @@ def result_message(dice_size, dice_array, result=None, charactor=None, ability_n
         if dice_size == 100 and np.sum(dice_array) >= 96:
             result_msg += '【ファンブル】'
         d = None
-
+ 
     return (inequality, d, result_msg)
-
-
+ 
 def dice_message(input_msg, message):
     if '不定の狂気' in input_msg:
         return ind_madness()
@@ -405,7 +414,7 @@ def dice_message(input_msg, message):
         return help()
     else:
         charactor = get_charactor(str(message.author))
-
+ 
         if len(input_msg) == 3:
             dice_num = input_msg[0]
             dice_size = input_msg[1]
@@ -414,14 +423,14 @@ def dice_message(input_msg, message):
             ability_name, ability, ability_detail = calc_ability(input_msg[0], charactor)
             dice_num = charactor[ability_name]['dice_num']
             dice_size = charactor[ability_name]['dice_size']
-
+ 
         dice_num = int(dice_num)
         dice_size = int(dice_size)
         dice_array = dice(dice_num, dice_size)
         result = judge(dice_array, ability)
-
+ 
         (inequality, d, result_msg) = result_message(dice_size, dice_array, result, charactor, ability_name)
-
+ 
         return  '【{ability_name}】{operator} {correction} : '\
                 '{base_ability}{operator}{correction} = {ability}'\
                 '{inequality} {dice_result} = {dice_array} {result_msg}'.format(
@@ -434,7 +443,7 @@ def dice_message(input_msg, message):
                     dice_result = np.sum(dice_array),
                     dice_array = dice_array,
                     result_msg = result_msg)
-
+ 
 def calc_ability(input_msg, charactor):
     operators = ['+', '-', '*', '/']
     for opt in operators:
@@ -452,9 +461,9 @@ def calc_ability(input_msg, charactor):
         correction = ''
         operator = ''
         ability = charactor[ability_name]['value']
-
+ 
     return ability_name, int(ability), (charactor[ability_name]['value'], operator, correction)
-
+ 
 def help():
     msg = '【使い方】\n'\
     '**ダイスロール**: `/dice [ダイスの数]d[出目の最大値]`\n'\
@@ -466,7 +475,7 @@ def help():
     '**キャラメイク**: `/cm`\n'\
     '**キャラ紹介**: `/ci`\n'
     return msg
-
+ 
 def bot_startswitch(message):
     # 開始ワード
     if message.content.startswith('/dice'):
@@ -480,32 +489,32 @@ def bot_startswitch(message):
         return parse('VS {}/{}', message.content)
     else:
         return None
-
+ 
 def playmp3(voice, filepath):
     voice.play(discord.FFmpegPCMAudio(filepath), after=lambda e: print('play error:', e))
-
+ 
 parser = argparse.ArgumentParser(description='')
-
+ 
 parser.add_argument('-m', '--mode', help='run mode option', default='release', choices=['debug', 'release'])
-
+ 
 args = parser.parse_args()
-
+ 
 filepath = {
     'debug': 'config_test.json',
     'release': 'config.json'
 }
-
+ 
 conf = load_config(filepath[args.mode])
 client = discord.Client()
 client_id = conf['client_id']
-
+ 
 voice = None
-
+ 
 @client.event
 async def on_ready():
     print('Logged in')
     print('-----')
-
+ 
 @client.event
 async def on_message(message):
     global voice
@@ -523,5 +532,5 @@ async def on_message(message):
             playmp3(voice, 'dice.mp3')
             await message.channel.send(m) # discord.py ver1.0
             #await client.send_message(message.channel, m) # discord.py ver0.16
-
+ 
 client.run(client_id)
