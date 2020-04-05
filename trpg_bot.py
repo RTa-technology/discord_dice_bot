@@ -7,6 +7,11 @@ from parse import parse
 import json
 import unicodedata
 import argparse
+from discord.ext import commands
+ 
+bot = rta.Bot(command_prefix='?')
+ 
+token = os.environ['DISCORD_BOT_TOKEN']
  
 def get_east_asian_width_count(text):
     count = 0
@@ -510,12 +515,12 @@ client_id = conf['client_id']
  
 voice = None
  
-@client.event
+@bot.event
 async def on_ready():
     print('Logged in')
     print('-----')
  
-@client.event
+@bot.event
 async def on_message(message):
     global voice
     # 送り主がBotじゃないか
@@ -533,4 +538,4 @@ async def on_message(message):
             await message.channel.send(m) # discord.py ver1.0
             #await client.send_message(message.channel, m) # discord.py ver0.16
  
-client.run(client_id)
+bot.run(token)
