@@ -4,6 +4,5 @@ gspread
 discord
 parse
 numpy
-json
 unicodedata
 argparse
