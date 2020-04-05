@@ -1,13 +1,14 @@
 from oauth2client.service_account import ServiceAccountCredentials
 from httplib2 import Http
 import gspread
-import discord
+from discord.ext import commands
+import traceback
 import numpy as np
 from parse import parse
 import json
 import unicodedata
 import argparse
-from discord.ext import commands
+
  
 bot = rta.Bot(command_prefix='?')
  
