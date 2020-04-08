@@ -59,7 +59,7 @@ def get_charactor(name):
     col_dice_4560 = ['1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d4', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100', '1d100']
  
     charactor = {}
-    cell_keys = col_keys_worksheet
+    cell_keys = col_keys_worksheet #？？？は？
     cell_values = col_values_worksheet
     cell_dice = col_dice_worksheet
     for k, v, d in zip(cell_keys, cell_values, cell_dice):
