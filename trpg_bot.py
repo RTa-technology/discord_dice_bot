@@ -507,7 +507,7 @@ async def on_ready():
 async def on_message(message):
     global voice
     # 送り主がBotじゃないか
-    if client.user != message.author:
+    if bot.user != message.author:
         if voice is None:
             channel = message.author.voice.channel
             voice = await channel.connect()
