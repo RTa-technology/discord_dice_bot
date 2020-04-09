@@ -10,7 +10,7 @@ from discord.ext import commands as rta
 
 
 
-bot = rta.Bot(command_prefix='$')#, help_command=JapaneseHelpCommand()
+client = rta.Bot(command_prefix='$')#, help_command=JapaneseHelpCommand()
 
 token = os.environ['DISCORD_BOT_TOKEN']
 def get_east_asian_width_count(text):
@@ -498,19 +498,16 @@ def bot_startswitch(message):
 
 
  
-@bot.event
+@client.event
 async def on_ready():
     print('Logged in')
     print('-----')
  
-@bot.event
+@client.event
 async def on_message(message):
     global voice
     # 送り主がBotじゃないか
-    if bot.user != message.author:
-        if voice is None:
-            channel = message.author.voice.channel
-            voice = await channel.connect()
+    if client.user != message.author:
         # 開始ワード
         input_msg = bot_startswitch(message).fixed
         if input_msg is not None:
@@ -520,4 +517,4 @@ async def on_message(message):
             await message.channel.send(m) # discord.py ver1.0
             #await client.send_message(message.channel, m) # discord.py ver0.16
 
-bot.run(token)
+client.run(token)
