@@ -1,1 +1,1 @@
-woker: python trpg_bot.py
+worker: python trpg_bot.py
