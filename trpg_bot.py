@@ -9,9 +9,6 @@ import argparse
 from discord.ext import commands as rta
 
 
-
-client = rta.Bot(command_prefix='$')#, help_command=JapaneseHelpCommand()
-
 token = os.environ['DISCORD_BOT_TOKEN']
 def get_east_asian_width_count(text):
     count = 0
